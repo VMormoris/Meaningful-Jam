@@ -8,18 +8,41 @@ public class PlayerMovement : MonoBehaviour
     public Tilemap SlideMap;
     public Tilemap ObstaclesMap;
     public Tilemap WalkMap;
+    public Tilemap ItemsMap;
+    public Tilemap DeathMap;
+
+    public GameObject BloodSplatter;
 
     public float Speed = 5.0f;
     public Rigidbody2D rb;
     public Animator animator;
 
-    public Vector2 mDir;
-    public bool mSliding;
-    public bool mHasCollided = false;
+    private Vector2 mDir;
+    private bool mSliding;
+    private bool mHasCollided = false;
+
+    private int mItems = 0;
+    public bool mIsDead = false;
 
     // Update is called once per frame
     void Update()
     {
+        if (mIsDead)
+            return;
+
+        if(IsTouchingDeathTraps())
+        {
+            mIsDead = true;
+            Debug.Log("Dying");
+            Instantiate(BloodSplatter, transform);
+        }
+
+        Vector3Int pos = ItemsMap.WorldToCell(transform.position);
+        if (ItemsMap.HasTile(pos))
+        {
+            mItems++;
+            ItemsMap.SetTile(pos, null);
+        }
         if (CanWalk())
         {
             mDir.y = 0.0f;
@@ -56,15 +79,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(!Colliding())
+        if(!Colliding() && !mIsDead)
             rb.MovePosition(rb.position + mDir * Speed * Time.fixedDeltaTime);
     }
 
     private bool Colliding()
     {
         Vector3 direction = new Vector3(mDir.x, mDir.y, 0.0f).normalized;
-        Vector3Int pos = SlideMap.WorldToCell(transform.position + direction * 0.5f);
+        Vector3Int pos = ObstaclesMap.WorldToCell(transform.position + direction * 0.5f);
         return ObstaclesMap.HasTile(pos);
+    }
+
+    private bool IsTouchingDeathTraps()
+    {
+        Vector3 direction = new Vector3(mDir.x, mDir.y, 0.0f).normalized;
+        Vector3Int pos = DeathMap.WorldToCell(transform.position + direction * 0.5f);
+        return DeathMap.HasTile(pos);
     }
 
     private bool CanWalk()
