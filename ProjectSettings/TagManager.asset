@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Obstacles
+    uniqueID: 969187043
+    locked: 0
+  - name: answers
+    uniqueID: 2324352557
+    locked: 0
