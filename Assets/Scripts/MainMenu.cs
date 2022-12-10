@@ -9,6 +9,7 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); //Load next scene from Scenes in build
     }
+
     public void GoToSettingsMenu()
     {
         SceneManager.LoadScene("SettingsScene");
