@@ -33,7 +33,6 @@ public class TestScript : MonoBehaviour
     private bool mCanBreak = false;
     private bool mIsDead = false;
 
-
     // Update is called once per frame
     void Update()
     {
