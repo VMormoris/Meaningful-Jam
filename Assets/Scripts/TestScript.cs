@@ -20,7 +20,6 @@ public class TestScript : MonoBehaviour
     public Animator animator;
 
     public float Speed = 5.0f;
-    public float mRotationAngle = 0.0f;
 
     public Vector2 mDir;
     public Vector3Int mTarget;
@@ -44,14 +43,12 @@ public class TestScript : MonoBehaviour
             mIsDead = true;
             Instantiate(BloodSplatter, transform);
         }
-        if (mDir.x < 0)
-            mRotationAngle = -45.0f;
 
-        else if (mDir.x > 0)
-            mRotationAngle = 45.0f;
-        
-        transform.rotation = Quaternion.Euler(0.0f, 0.0f, IsOnSlope() ? mRotationAngle : 0.0f);
-        //mRotationAngle = 0.0f;
+        float angle = -45.0f;
+        if ((mDir.x > 0.0f && mSlopeUp) || (mDir.x < 0.0f && mSlopeDown))
+            angle = 45.0f;
+        transform.rotation = Quaternion.Euler(0.0f, 0.0f, IsOnSlope() ? angle : 0.0f);
+
         if (CanWalk() && !mMoving)
         {
             mDir.y = 0.0f;
@@ -93,7 +90,7 @@ public class TestScript : MonoBehaviour
                 mSliding = !CanWalk();
             }
         }
-        mRotationAngle = 0.0f;
+
         Move();
         animator.SetFloat("horizontal", mDir.x);
         animator.SetFloat("vertical", mDir.y);
@@ -169,11 +166,6 @@ public class TestScript : MonoBehaviour
         Vector3Int aux = SlopeMap.WorldToCell(transform.position - offset);
         Vector3Int prev = ElevatedMap.WorldToCell(transform.position - dir);
         Vector3Int Down = SlopeMap.WorldToCell(transform.position + new Vector3(0.0f, -0.5001f));
-
-        if (mDir.x > 0)
-            //aux = SlopeMap.WorldToCell(transform.position + offset);
-            //prev = ElevatedMap.WorldToCell(transform.position + dir);
-            Down = SlopeMap.WorldToCell(transform.position + new Vector3(0.0f, 0.5001f));
 
         if ((SlopeMap.HasTile(pos) || SlopeMap.HasTile(aux)) && mDir.x != 0.0f && !mSlopeDown)
         {
