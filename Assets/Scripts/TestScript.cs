@@ -17,14 +17,18 @@ public class TestScript : MonoBehaviour
     public float Speed = 5.0f;
   
     public Vector2 mDir;
-    private Vector3Int mTarget;
+    public Vector3Int mTarget;
     private bool mMoving = false;
     private bool mSliding = false;
     private bool mHasCollided = false;
+    public bool mSlopeUp = false;
+    public bool mSlopeDown = false;
 
     // Update is called once per frame
     void Update()
     {
+        transform.rotation = Quaternion.Euler(0.0f, 0.0f, IsOnSlope() ? -45.0f : 0.0f);
+
         if (CanWalk() && !mMoving)
         {
             mDir.y = 0.0f;
@@ -59,7 +63,7 @@ public class TestScript : MonoBehaviour
             if (mDir.x == 0.0f)
                 mDir.y = Input.GetAxisRaw("Vertical");
 
-            if(mDir.sqrMagnitude > 0.0f)
+            if(mDir.sqrMagnitude > 0.0f && !Colliding())
             {
                 mHasCollided = false;
                 mMoving = true;
@@ -86,9 +90,9 @@ public class TestScript : MonoBehaviour
         Vector3Int pos = SlideMap.WorldToCell(transform.position);
         Vector3Int NextPos = ObstacleMap.WorldToCell(transform.position + dir * 0.5f);
         Vector3 DownX = new Vector3(mDir.x, -1.0f).normalized;
-        Vector3Int DownNext = SlopeMap.WorldToCell(transform.position + DownX * 0.5f);
+        Vector3Int DownNext = SlopeMap.WorldToCell(transform.position + DownX);
         return ObstacleMap.HasTile(NextPos) ||
-            (SlideMap.HasTile(pos) && ElevatedMap.HasTile(NextPos) && !SlopeMap.HasTile(pos)) ||
+            (SlideMap.HasTile(pos) && ElevatedMap.HasTile(NextPos) && !SlopeMap.HasTile(pos) && !mSlopeUp) ||
             (ElevatedMap.HasTile(pos) && SlideMap.HasTile(NextPos) && !SlopeMap.HasTile(DownNext)) ||
             (mDir.y != 0.0f && SlopeMap.HasTile(NextPos));
     }
@@ -107,12 +111,15 @@ public class TestScript : MonoBehaviour
         if (dist <= 0.05f)
         {
             transform.position = target;
-            mTarget = WalkMap.WorldToCell(transform.position);
-
             if (!SlideMap.HasTile(mTarget) && !ElevatedMap.HasTile(mTarget))
+            {
+                mTarget = WalkMap.WorldToCell(transform.position);
                 mMoving = false;
+            }
             else
                 mTarget = SlideMap.WorldToCell(transform.position + dir);
+            if (SlopeMap.HasTile(mTarget))
+                mTarget += new Vector3Int((int)mDir.x, 1);
 
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
             if (WalkMap.HasTile(pos))
@@ -121,6 +128,33 @@ public class TestScript : MonoBehaviour
                 if(!WalkMap.HasTile(mTarget))
                     mDir = new Vector2(0.0f, 0.0f);
             }
+
+            mSlopeUp = false;
+            mSlopeDown = false;
         }
     }
+
+    private bool IsOnSlope()
+    {
+        Vector3Int pos = SlopeMap.WorldToCell(transform.position);
+        Vector3 dir = new Vector3(mDir.x, mDir.y);
+        Vector3 offset = transform.TransformDirection(dir * 0.64f);
+        Vector3Int aux = SlopeMap.WorldToCell(transform.position - offset);
+
+        Vector3Int prev = ElevatedMap.WorldToCell(transform.position - dir);
+        Vector3Int Down = SlopeMap.WorldToCell(transform.position + new Vector3(0.0f, -0.51f));
+        if ((SlopeMap.HasTile(pos) || SlopeMap.HasTile(aux)) && mDir.x != 0.0f && !mSlopeDown)
+        {
+            mSlopeUp = true;
+            return true;
+        }
+        else if((ElevatedMap.HasTile(prev) && SlopeMap.HasTile(Down)) && mDir.x != 0.0f)
+        {
+            mSlopeDown = true;
+            return true;
+        }
+        else
+            return false;
+    }
+
 }
