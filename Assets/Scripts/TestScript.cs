@@ -11,6 +11,11 @@ public class TestScript : MonoBehaviour
     public Tilemap ObstacleMap;
     public Tilemap SlopeMap;
     public Tilemap ElevatedMap;
+    public Tilemap BreakableMap;
+    public Tilemap DeathMap;
+
+    public GameObject BreakingSnowball;
+    public GameObject BloodSplatter;
 
     public Animator animator;
 
@@ -21,12 +26,23 @@ public class TestScript : MonoBehaviour
     private bool mMoving = false;
     private bool mSliding = false;
     private bool mHasCollided = false;
-    public bool mSlopeUp = false;
-    public bool mSlopeDown = false;
+    private bool mSlopeUp = false;
+    private bool mSlopeDown = false;
+    private bool mCanBreak = false;
+    private bool mIsDead = false;
 
     // Update is called once per frame
     void Update()
     {
+        if (mIsDead)
+            return;
+
+        if(IsTouchingDeathTrap())
+        {
+            mIsDead = true;
+            Instantiate(BloodSplatter, transform);
+        }
+
         transform.rotation = Quaternion.Euler(0.0f, 0.0f, IsOnSlope() ? -45.0f : 0.0f);
 
         if (CanWalk() && !mMoving)
@@ -35,10 +51,9 @@ public class TestScript : MonoBehaviour
             mDir.x = Input.GetAxisRaw("Horizontal");
             if (mDir.x == 0.0f)
                 mDir.y = Input.GetAxisRaw("Vertical");
-
+            mCanBreak = false;
             if (mDir.sqrMagnitude > 0.0f)
             {
-
                 Vector3 dir = new Vector3(mDir.x, mDir.y);
                 mTarget = WalkMap.WorldToCell(transform.position + dir);
                 mMoving = true;
@@ -63,7 +78,8 @@ public class TestScript : MonoBehaviour
             if (mDir.x == 0.0f)
                 mDir.y = Input.GetAxisRaw("Vertical");
 
-            if(mDir.sqrMagnitude > 0.0f && !Colliding())
+            mCanBreak = false;
+            if (mDir.sqrMagnitude > 0.0f && !Colliding())
             {
                 mHasCollided = false;
                 mMoving = true;
@@ -78,10 +94,88 @@ public class TestScript : MonoBehaviour
         animator.SetBool("Sliding", mSliding);
     }
 
-    private bool CanWalk()
+    private void Move()
     {
-        Vector3Int pos = WalkMap.WorldToCell(transform.position);
-        return WalkMap.HasTile(pos);
+        float speed = Speed * (mCanBreak ? 1.5f : 1.0f);
+        Vector3 target = WalkMap.GetCellCenterWorld(mTarget);
+        Vector3 dir = new Vector3(mDir.x, mDir.y);
+        if (mMoving)
+        {
+            Vector2 offset = transform.TransformDirection(dir * speed * Time.deltaTime);
+            transform.position += new Vector3(offset.x, offset.y);
+            if(mCanBreak && !IsOnSlope())
+            {
+                int y = (int)transform.position.y;
+                transform.position = new Vector3(transform.position.x, y + (y < 0 ? -0.5f : 0.5f));
+
+                Vector3Int pos = BreakableMap.WorldToCell(transform.position);
+                if(BreakableMap.HasTile(pos))
+                {
+                    BreakableMap.SetTile(pos, null);
+                    Instantiate(BreakingSnowball, BreakableMap.GetCellCenterWorld(pos), Quaternion.Euler(0.0f, 0.0f, 0.0f));
+                }
+            }
+        }
+
+        float dist = Vector3.Distance(target, transform.position);
+        if (dist <= 0.055f)
+        {
+            transform.position = target;
+            Vector3Int pos = WalkMap.WorldToCell(transform.position);
+            if (WalkMap.HasTile(mTarget))
+            {
+                mTarget = WalkMap.WorldToCell(transform.position);
+                mMoving = false;
+            }
+            else
+                mTarget = SlideMap.WorldToCell(transform.position + dir);
+
+            Vector3Int DownNext = mTarget + new Vector3Int(0, -1);
+            if (SlopeMap.HasTile(mTarget))
+                mTarget += new Vector3Int((int)mDir.x, 1);
+            else if (ElevatedMap.HasTile(pos) && SlideMap.HasTile(mTarget) && SlopeMap.HasTile(DownNext))
+                mTarget += new Vector3Int((int)mDir.x, -1);
+
+            if (WalkMap.HasTile(pos))
+            {
+                mSliding = false;
+                if(!WalkMap.HasTile(mTarget))
+                    mDir = new Vector2(0.0f, 0.0f);
+            }
+
+            mSlopeUp = false;
+            mSlopeDown = false;
+        }
+
+        if(!mMoving)
+        {
+            int y = (int)transform.position.y;
+            transform.position = new Vector3(transform.position.x, y + (y < 0 ? -0.5f : 0.5f));
+        }
+    }
+
+    private bool IsOnSlope()
+    {
+        Vector3Int pos = SlopeMap.WorldToCell(transform.position);
+        Vector3 dir = new Vector3(mDir.x, mDir.y);
+        Vector3 offset = transform.TransformDirection(dir * 0.64f);
+        Vector3Int aux = SlopeMap.WorldToCell(transform.position - offset);
+
+        Vector3Int prev = ElevatedMap.WorldToCell(transform.position - dir);
+        Vector3Int Down = SlopeMap.WorldToCell(transform.position + new Vector3(0.0f, -0.5001f));
+        if ((SlopeMap.HasTile(pos) || SlopeMap.HasTile(aux)) && mDir.x != 0.0f && !mSlopeDown)
+        {
+            mSlopeUp = true;
+            return true;
+        }
+        else if((ElevatedMap.HasTile(prev) && SlopeMap.HasTile(Down)) && mDir.x != 0.0f)
+        {
+            mSlopeDown = true;
+            mCanBreak = true;
+            return true;
+        }
+        else
+            return false;
     }
 
     private bool Colliding()
@@ -94,67 +188,21 @@ public class TestScript : MonoBehaviour
         return ObstacleMap.HasTile(NextPos) ||
             (SlideMap.HasTile(pos) && ElevatedMap.HasTile(NextPos) && !SlopeMap.HasTile(pos) && !mSlopeUp) ||
             (ElevatedMap.HasTile(pos) && SlideMap.HasTile(NextPos) && !SlopeMap.HasTile(DownNext)) ||
-            (mDir.y != 0.0f && SlopeMap.HasTile(NextPos));
+            (mDir.y != 0.0f && SlopeMap.HasTile(NextPos)) ||
+            (BreakableMap.HasTile(NextPos) && !mCanBreak);
     }
 
-    private void Move()
+    private bool CanWalk()
     {
-        Vector3 target = WalkMap.GetCellCenterWorld(mTarget);
-        Vector3 dir = new Vector3(mDir.x, mDir.y);
-        if (mMoving)
-        {
-            Vector2 offset = transform.TransformDirection(dir * Speed * Time.deltaTime);
-            transform.position += new Vector3(offset.x, offset.y);
-        }
-
-        float dist = Vector3.Distance(target, transform.position);
-        if (dist <= 0.05f)
-        {
-            transform.position = target;
-            if (!SlideMap.HasTile(mTarget) && !ElevatedMap.HasTile(mTarget))
-            {
-                mTarget = WalkMap.WorldToCell(transform.position);
-                mMoving = false;
-            }
-            else
-                mTarget = SlideMap.WorldToCell(transform.position + dir);
-            if (SlopeMap.HasTile(mTarget))
-                mTarget += new Vector3Int((int)mDir.x, 1);
-
-            Vector3Int pos = WalkMap.WorldToCell(transform.position);
-            if (WalkMap.HasTile(pos))
-            {
-                mSliding = false;
-                if(!WalkMap.HasTile(mTarget))
-                    mDir = new Vector2(0.0f, 0.0f);
-            }
-
-            mSlopeUp = false;
-            mSlopeDown = false;
-        }
+        Vector3Int pos = WalkMap.WorldToCell(transform.position);
+        return WalkMap.HasTile(pos);
     }
 
-    private bool IsOnSlope()
+    private bool IsTouchingDeathTrap()
     {
-        Vector3Int pos = SlopeMap.WorldToCell(transform.position);
-        Vector3 dir = new Vector3(mDir.x, mDir.y);
-        Vector3 offset = transform.TransformDirection(dir * 0.64f);
-        Vector3Int aux = SlopeMap.WorldToCell(transform.position - offset);
-
-        Vector3Int prev = ElevatedMap.WorldToCell(transform.position - dir);
-        Vector3Int Down = SlopeMap.WorldToCell(transform.position + new Vector3(0.0f, -0.51f));
-        if ((SlopeMap.HasTile(pos) || SlopeMap.HasTile(aux)) && mDir.x != 0.0f && !mSlopeDown)
-        {
-            mSlopeUp = true;
-            return true;
-        }
-        else if((ElevatedMap.HasTile(prev) && SlopeMap.HasTile(Down)) && mDir.x != 0.0f)
-        {
-            mSlopeDown = true;
-            return true;
-        }
-        else
-            return false;
+        Vector3 direction = new Vector3(mDir.x, mDir.y, 0.0f).normalized;
+        Vector3Int pos = DeathMap.WorldToCell(transform.position + direction * 0.5f);
+        return DeathMap.HasTile(pos);
     }
 
 }

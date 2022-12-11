@@ -99,6 +99,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
     private bool Colliding()
     {
         Vector3 dir = new Vector3(mDir.x, mDir.y);
