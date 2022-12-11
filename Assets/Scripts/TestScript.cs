@@ -16,10 +16,12 @@ public class TestScript : MonoBehaviour
 
     public GameObject BreakingSnowball;
     public GameObject BloodSplatter;
-
+    
     public Animator animator;
 
     public float Speed = 5.0f;
+
+    public Transform Movables;
 
     public Vector2 mDir;
     public Vector3Int mTarget;
@@ -59,8 +61,11 @@ public class TestScript : MonoBehaviour
             if (mDir.sqrMagnitude > 0.0f)
             {
                 Vector3 dir = new Vector3(mDir.x, mDir.y);
-                mTarget = WalkMap.WorldToCell(transform.position + dir);
-                mMoving = true;
+                if (!Colliding())
+                {
+                    mTarget = WalkMap.WorldToCell(transform.position + dir);
+                    mMoving = true;
+                }
             }
         }
         else if ((mDir.x != 0.0f || mDir.y != 0.0f) && !CanWalk())
@@ -91,7 +96,9 @@ public class TestScript : MonoBehaviour
             }
         }
 
+        PushInRange();
         Move();
+
         animator.SetFloat("horizontal", mDir.x);
         animator.SetFloat("vertical", mDir.y);
         animator.SetFloat("Speed", mDir.sqrMagnitude);
@@ -110,7 +117,7 @@ public class TestScript : MonoBehaviour
             if(mCanBreak && !IsOnSlope())
             {
                 int y = (int)transform.position.y;
-                transform.position = new Vector3(transform.position.x, y + (y < 0 ? -0.5f : 0.5f));
+                transform.position = new Vector3(transform.position.x, y + (y <= 0 ? -0.5f : 0.5f));
 
                 Vector3Int pos = BreakableMap.WorldToCell(transform.position);
                 if(BreakableMap.HasTile(pos))
@@ -154,7 +161,7 @@ public class TestScript : MonoBehaviour
         if(!mMoving)
         {
             int y = (int)transform.position.y;
-            transform.position = new Vector3(transform.position.x, y + (y < 0 ? -0.5f : 0.5f));
+            transform.position = new Vector3(transform.position.x, y + (y <= 0 ? -0.5f : 0.5f));
         }
     }
 
@@ -207,6 +214,27 @@ public class TestScript : MonoBehaviour
         Vector3 direction = new Vector3(mDir.x, mDir.y, 0.0f).normalized;
         Vector3Int pos = DeathMap.WorldToCell(transform.position + direction * 0.5f);
         return DeathMap.HasTile(pos);
+    }
+
+    private void PushInRange()
+    {
+        const float MinDistance = 1.0f;//1^2
+        foreach(Transform child in Movables)
+        {
+            if(QuickDistance(child.position, transform.position) <= MinDistance)
+            {
+                Movable movable = child.GetComponent<Movable>();
+                Debug.Log("Pushing");
+                movable.Push(mDir);
+            }
+        }
+    }
+
+    private float QuickDistance(Vector2 a, Vector2 b)
+    {
+        float x = a.x - b.x;
+        float y = a.y - b.y;
+        return x * x + y * y;
     }
 
 }
