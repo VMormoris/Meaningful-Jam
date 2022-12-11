@@ -223,7 +223,6 @@ public class TestScript : MonoBehaviour
             if(QuickDistance(child.position, transform.position) <= MinDistance)
             {
                 Movable movable = child.GetComponent<Movable>();
-                Debug.Log("Pushing");
                 movable.Push(mDir);
             }
         }

@@ -68,7 +68,6 @@ public class Movable : MonoBehaviour
     {
         mMoving = true;
         mDir = dir;
-        Debug.Log("Pushed");
     }
 
 }
