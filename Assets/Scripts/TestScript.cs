@@ -6,6 +6,8 @@ using UnityEngine.Tilemaps;
 
 public class TestScript : MonoBehaviour
 {
+    public TileBase Hole;
+    
     public Tilemap WalkMap;
     public Tilemap SlideMap;
     public Tilemap ObstacleMap;
@@ -13,6 +15,8 @@ public class TestScript : MonoBehaviour
     public Tilemap ElevatedMap;
     public Tilemap BreakableMap;
     public Tilemap DeathMap;
+    public Tilemap CrackedMap;
+    public Tilemap HoleMap;
 
     public GameObject BreakingSnowball;
     public GameObject BloodSplatter;
@@ -20,6 +24,7 @@ public class TestScript : MonoBehaviour
     public Animator animator;
 
     public float Speed = 5.0f;
+    public float FallingSpeed = 0.1f;
 
     public Transform Movables;
 
@@ -36,14 +41,21 @@ public class TestScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (mIsDead)
-            return;
-
         if (IsTouchingDeathTrap())
         {
+            if(!mIsDead)
+                Instantiate(BloodSplatter, transform);
             mIsDead = true;
-            Instantiate(BloodSplatter, transform);
+            return;
         }
+        else if (mIsDead)
+        {
+            transform.localScale -= new Vector3(1.0f, 1.0f) * FallingSpeed * Time.deltaTime;
+            if (transform.localScale.x <= 0.0f)
+                gameObject.SetActive(false);
+            return;
+        }
+
 
         float angle = -45.0f;
         if ((mDir.x > 0.0f && mSlopeUp) || (mDir.x < 0.0f && mSlopeDown))
@@ -132,10 +144,20 @@ public class TestScript : MonoBehaviour
         {
             transform.position = target;
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
-            if (WalkMap.HasTile(mTarget))
+
+            if (HoleMap.HasTile(pos))
+                mIsDead = true;
+
+            if (WalkMap.HasTile(mTarget) || CrackedMap.HasTile(mTarget))
             {
                 mTarget = WalkMap.WorldToCell(transform.position);
                 mMoving = false;
+                Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
+                if(CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
+                {
+                    CrackedMap.SetTile(prev, null);
+                    HoleMap.SetTile(prev, Hole);
+                }
             }
             else
                 mTarget = SlideMap.WorldToCell(transform.position + dir);
@@ -146,10 +168,10 @@ public class TestScript : MonoBehaviour
             else if (ElevatedMap.HasTile(pos) && SlideMap.HasTile(mTarget) && SlopeMap.HasTile(DownNext))
                 mTarget += new Vector3Int((int)mDir.x, -1);
 
-            if (WalkMap.HasTile(pos))
+            if (WalkMap.HasTile(pos) || CrackedMap.HasTile(pos))
             {
                 mSliding = false;
-                if(!WalkMap.HasTile(mTarget))
+                if(!WalkMap.HasTile(mTarget) && !CrackedMap.HasTile(mTarget))
                     mDir = new Vector2(0.0f, 0.0f);
             }
 
@@ -205,7 +227,7 @@ public class TestScript : MonoBehaviour
     private bool CanWalk()
     {
         Vector3Int pos = WalkMap.WorldToCell(transform.position);
-        return WalkMap.HasTile(pos);
+        return WalkMap.HasTile(pos) || CrackedMap.HasTile(pos);
     }
 
     private bool IsTouchingDeathTrap()
