@@ -28,6 +28,7 @@ public class TestScript : MonoBehaviour
 
     public Transform Movables;
 
+    public Vector2 mPrevDir = new Vector2(0.0f, 1.0f);
     public Vector2 mDir;
     public Vector3Int mTarget;
     public bool mMoving = false;
@@ -64,6 +65,8 @@ public class TestScript : MonoBehaviour
 
         if (CanWalk() && !mMoving)
         {
+            if(mDir.sqrMagnitude > 0.0f)
+                mPrevDir = mDir;
             mDir.y = 0.0f;
             mDir.x = Input.GetAxisRaw("Horizontal");
             if (mDir.x == 0.0f)
@@ -85,6 +88,7 @@ public class TestScript : MonoBehaviour
         if(Colliding() && !mHasCollided)
         {
             mTarget = SlideMap.WorldToCell(transform.position);
+            mPrevDir = mDir;
             mDir = new Vector2(0.0f, 0.0f);
 
             mSliding = false;
@@ -93,6 +97,8 @@ public class TestScript : MonoBehaviour
         }
         else if(mHasCollided)
         {
+            if (mDir.sqrMagnitude > 0.0f)
+                mPrevDir = mDir;
             mDir.y = 0.0f;
             mDir.x = Input.GetAxisRaw("Horizontal");
             if (mDir.x == 0.0f)
@@ -110,6 +116,8 @@ public class TestScript : MonoBehaviour
         PushInRange();
         Move();
 
+        animator.SetFloat("prevHorizontal", mPrevDir.x);
+        animator.SetFloat("prevVertical", mPrevDir.y);
         animator.SetFloat("horizontal", mDir.x);
         animator.SetFloat("vertical", mDir.y);
         animator.SetFloat("Speed", mDir.sqrMagnitude);
@@ -171,8 +179,11 @@ public class TestScript : MonoBehaviour
             if (WalkMap.HasTile(pos) || CrackedMap.HasTile(pos))
             {
                 mSliding = false;
-                if(!WalkMap.HasTile(mTarget) && !CrackedMap.HasTile(mTarget))
+                if (!WalkMap.HasTile(mTarget) && !CrackedMap.HasTile(mTarget))
+                {
+                    mPrevDir = mDir;
                     mDir = new Vector2(0.0f, 0.0f);
+                }
             }
 
             mSlopeUp = false;

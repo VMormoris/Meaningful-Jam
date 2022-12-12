@@ -132,5 +132,5 @@ MonoBehaviour:
   SlopeMap: {fileID: 0}
   DeathTrapMap: {fileID: 0}
   BreakingSnowball: {fileID: 1166549898723746374, guid: 6c8ab187b559121458f51ca8e60d7fec, type: 3}
-  AngularVelocity: 240
+  AngularVelocity: 360
   Speed: 15
