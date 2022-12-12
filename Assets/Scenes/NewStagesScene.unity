@@ -869,6 +869,13 @@ MonoBehaviour:
   Movables: {fileID: 958346177}
   mDir: {x: 0, y: 0}
   mTarget: {x: 0, y: 0, z: 0}
+  mMoving: 0
+  mSliding: 0
+  mHasCollided: 0
+  mSlopeUp: 0
+  mSlopeDown: 0
+  mCanBreak: 0
+  mIsDead: 0
 --- !u!114 &426225325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,9 +939,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingLayerID: -1970614739
+  m_SortingLayer: 2
+  m_SortingOrder: 0
   m_Sprite: {fileID: -26685408, guid: 8f647340eb3872e4c9527ce47a0be651, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -13632,7 +13639,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: -1970614739
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1698360393
 RectTransform:

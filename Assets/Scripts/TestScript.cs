@@ -30,13 +30,13 @@ public class TestScript : MonoBehaviour
 
     public Vector2 mDir;
     public Vector3Int mTarget;
-    private bool mMoving = false;
-    private bool mSliding = false;
-    private bool mHasCollided = false;
-    private bool mSlopeUp = false;
-    private bool mSlopeDown = false;
-    private bool mCanBreak = false;
-    private bool mIsDead = false;
+    public bool mMoving = false;
+    public bool mSliding = false;
+    public bool mHasCollided = false;
+    public bool mSlopeUp = false;
+    public bool mSlopeDown = false;
+    public bool mCanBreak = false;
+    public bool mIsDead = false;
 
     // Update is called once per frame
     void Update()
@@ -82,7 +82,7 @@ public class TestScript : MonoBehaviour
         else if ((mDir.x != 0.0f || mDir.y != 0.0f) && !CanWalk())
             mSliding = true;
 
-        if(!mHasCollided && Colliding())
+        if(Colliding() && !mHasCollided)
         {
             mTarget = SlideMap.WorldToCell(transform.position);
             mDir = new Vector2(0.0f, 0.0f);
@@ -140,7 +140,7 @@ public class TestScript : MonoBehaviour
         }
 
         float dist = Vector3.Distance(target, transform.position);
-        if (dist <= 0.055f)
+        if (dist <= 0.0899999999999f)
         {
             transform.position = target;
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
@@ -214,7 +214,7 @@ public class TestScript : MonoBehaviour
     {
         Vector3 dir = new Vector3(mDir.x, mDir.y);
         Vector3Int pos = SlideMap.WorldToCell(transform.position);
-        Vector3Int NextPos = ObstacleMap.WorldToCell(transform.position + dir * 0.5f);
+        Vector3Int NextPos = ObstacleMap.WorldToCell(transform.position + dir * 0.5001f);
         Vector3 DownX = new Vector3(mDir.x, -1.0f).normalized;
         Vector3Int DownNext = SlopeMap.WorldToCell(transform.position + DownX);
         return ObstacleMap.HasTile(NextPos) ||
