@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -9,7 +10,9 @@ public class PauseMenu : MonoBehaviour
     public GameObject pauseMenuUI;
     public GameObject Pausebtn;
     public GameObject Resumebtn;
-
+    public GameObject MuteBtn;
+    public GameObject Unmutebtn;
+    public AudioMixer audioMixer;
 
     // Update is called once per frame
     void Update()
@@ -32,6 +35,7 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(false); 
         Time.timeScale = 1f;
         GameIsPaused = false;
+        Pausebtn.SetActive(true);
     }
 
     public void Pause()
@@ -59,5 +63,22 @@ public class PauseMenu : MonoBehaviour
         Pause();
         Resumebtn.SetActive(false);
         Time.timeScale = 1f;
+    }
+    public void MuteGame(bool mute)
+    {
+        if (mute)
+        {
+            MuteBtn.SetActive(false);
+            Unmutebtn.SetActive(true);
+            audioMixer.SetFloat("Volume", -80.0f);
+            Debug.Log("mute");
+        }
+        else
+        {
+            MuteBtn.SetActive(true);
+            Unmutebtn.SetActive(false);
+            audioMixer.SetFloat("Volume", 0.0f);
+            Debug.Log("unmute");
+        }
     }
 }
