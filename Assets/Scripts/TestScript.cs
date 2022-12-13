@@ -20,6 +20,7 @@ public class TestScript : MonoBehaviour
 
     public GameObject BreakingSnowball;
     public GameObject BloodSplatter;
+    public GameObject UICanvas;
     
     public Animator animator;
 
@@ -47,6 +48,7 @@ public class TestScript : MonoBehaviour
             if(!mIsDead)
                 Instantiate(BloodSplatter, transform);
             mIsDead = true;
+            UICanvas.GetComponent<PauseMenu>().DeathMenu();
             return;
         }
         else if (mIsDead)
@@ -54,6 +56,7 @@ public class TestScript : MonoBehaviour
             transform.localScale -= new Vector3(1.0f, 1.0f) * FallingSpeed * Time.deltaTime;
             if (transform.localScale.x <= 0.0f)
                 gameObject.SetActive(false);
+            UICanvas.GetComponent<PauseMenu>().DeathMenu();
             return;
         }
 

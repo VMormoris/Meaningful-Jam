@@ -6,6 +6,8 @@ using TMPro;
 public class PopUpSystem : MonoBehaviour
 {
     public GameObject popUpBox;
+    public GameObject Nextbtn;
+    public GameObject Player;
     public Animator animator;
     public string [] Tips;
 
@@ -14,13 +16,15 @@ public class PopUpSystem : MonoBehaviour
     public void ShowNextTip()
     {
         PopUp(Tips[index++]);
+        if (index >= Tips.Length)
+            Nextbtn.SetActive(false);
     }
 
     private void Start()
     {
         index = 0;
         ShowNextTip();
-
+        Player.GetComponent<TestScript>().enabled = false;
     }
     public void PopUp(string text)
     {
@@ -28,5 +32,9 @@ public class PopUpSystem : MonoBehaviour
         GetComponent<TextMeshProUGUI>().text = text;
         animator.SetTrigger("pop");
         animator.ResetTrigger("close");
+    }
+    public void ResetState()
+    {
+        Player.GetComponent<TestScript>().enabled = true;
     }
 }
