@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 
@@ -13,6 +14,7 @@ public class TestScript : MonoBehaviour
     public Tilemap ObstacleMap;
     public Tilemap SlopeMap;
     public Tilemap ElevatedMap;
+    public Tilemap ItemsMap;
     public Tilemap BreakableMap;
     public Tilemap DeathMap;
     public Tilemap CrackedMap;
@@ -39,16 +41,23 @@ public class TestScript : MonoBehaviour
     public bool mSlopeDown = false;
     public bool mCanBreak = false;
     public bool mIsDead = false;
+    public Vector3 FinishTile = new Vector3(15.5f, 499.5f);
+
+
+
 
     // Update is called once per frame
     void Update()
     {
         if (IsTouchingDeathTrap())
         {
-            if(!mIsDead)
+            if (!mIsDead)
+            {
                 Instantiate(BloodSplatter, transform);
+                UICanvas.GetComponent<PauseMenu>().DeathMenu();
+            }
             mIsDead = true;
-            UICanvas.GetComponent<PauseMenu>().DeathMenu();
+            
             return;
         }
         else if (mIsDead)
@@ -56,8 +65,15 @@ public class TestScript : MonoBehaviour
             transform.localScale -= new Vector3(1.0f, 1.0f) * FallingSpeed * Time.deltaTime;
             if (transform.localScale.x <= 0.0f)
                 gameObject.SetActive(false);
-            UICanvas.GetComponent<PauseMenu>().DeathMenu();
             return;
+        }
+
+        Vector3Int pos = ItemsMap.WorldToCell(transform.position);
+        if (ItemsMap.HasTile(pos))
+        {
+            GameContext.sItems++;
+            Debug.Log("item");
+            ItemsMap.SetTile(pos, null);
         }
 
 
@@ -68,7 +84,7 @@ public class TestScript : MonoBehaviour
 
         if (CanWalk() && !mMoving)
         {
-            if(mDir.sqrMagnitude > 0.0f)
+            if (mDir.sqrMagnitude > 0.0f)
                 mPrevDir = mDir;
             mDir.y = 0.0f;
             mDir.x = Input.GetAxisRaw("Horizontal");
@@ -82,11 +98,18 @@ public class TestScript : MonoBehaviour
                 {
                     mTarget = WalkMap.WorldToCell(transform.position + dir);
                     mMoving = true;
+                    if (SlideMap.HasTile(mTarget))
+                    {
+                        GameContext.sMoves++;
+                        Debug.Log(GameContext.sMoves);
+                    }
                 }
             }
         }
         else if ((mDir.x != 0.0f || mDir.y != 0.0f) && !CanWalk())
+        {
             mSliding = true;
+        }
 
         if(Colliding() && !mHasCollided)
         {
@@ -113,11 +136,17 @@ public class TestScript : MonoBehaviour
                 mHasCollided = false;
                 mMoving = true;
                 mSliding = !CanWalk();
+                if (mSliding)
+                {
+                    GameContext.sMoves++;
+                    Debug.Log(GameContext.sMoves);
+                }
             }
         }
 
         PushInRange();
         Move();
+
 
         animator.SetFloat("prevHorizontal", mPrevDir.x);
         animator.SetFloat("prevVertical", mPrevDir.y);
@@ -126,6 +155,7 @@ public class TestScript : MonoBehaviour
         animator.SetFloat("Speed", mDir.sqrMagnitude);
         animator.SetBool("Sliding", mSliding);
     }
+
 
     private void Move()
     {
@@ -148,27 +178,36 @@ public class TestScript : MonoBehaviour
                     Instantiate(BreakingSnowball, BreakableMap.GetCellCenterWorld(pos), Quaternion.Euler(0.0f, 0.0f, 0.0f));
                 }
             }
+
         }
 
         float dist = Vector3.Distance(target, transform.position);
         if (dist <= 0.0899999999999f)
         {
             transform.position = target;
+            if (target == FinishTile)
+                SceneManager.LoadScene("Menuscene");
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
 
             if (HoleMap.HasTile(pos))
+            {
                 mIsDead = true;
+                UICanvas.GetComponent<PauseMenu>().DeathMenu();
+            }
+
+            Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
+            if (CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
+            {
+                CrackedMap.SetTile(prev, null);
+                HoleMap.SetTile(prev, Hole);
+                GameContext.sCracked++;
+            }
 
             if (WalkMap.HasTile(mTarget) || CrackedMap.HasTile(mTarget))
             {
                 mTarget = WalkMap.WorldToCell(transform.position);
                 mMoving = false;
-                Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
-                if(CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
-                {
-                    CrackedMap.SetTile(prev, null);
-                    HoleMap.SetTile(prev, Hole);
-                }
+                
             }
             else
                 mTarget = SlideMap.WorldToCell(transform.position + dir);
@@ -269,6 +308,7 @@ public class TestScript : MonoBehaviour
         float x = a.x - b.x;
         float y = a.y - b.y;
         return x * x + y * y;
+        
     }
-
+    
 }

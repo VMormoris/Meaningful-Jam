@@ -734,7 +734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1264,6 +1264,7 @@ MonoBehaviour:
   ObstacleMap: {fileID: 1762160651}
   SlopeMap: {fileID: 22527302}
   ElevatedMap: {fileID: 919230617}
+  ItemsMap: {fileID: 1857052147}
   BreakableMap: {fileID: 1832896791}
   DeathMap: {fileID: 1111333746}
   CrackedMap: {fileID: 1934280257}
@@ -1285,6 +1286,7 @@ MonoBehaviour:
   mSlopeDown: 0
   mCanBreak: 0
   mIsDead: 0
+  FinishTile: {x: 15.5, y: 499.5, z: 0}
 --- !u!114 &426225325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13356,16 +13358,6 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 22, y: 16, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 1
-      m_TileSpriteIndex: 3
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: -9, y: 17, z: 0}
     second:
       serializedVersion: 2
@@ -14080,8 +14072,8 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 632
     m_Data: {fileID: 11400000, guid: 604b06c6b7c979943a95d0f7bf510bfa, type: 2}
-  - m_RefCount: 1
-    m_Data: {fileID: 11400000, guid: 7f62da1bfa7be4542a6d33b9d2672e3a, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 9
     m_Data: {fileID: 11400000, guid: 95f4c6af1baebc8419cc95bfaccb36cf, type: 2}
   - m_RefCount: 0
@@ -14093,10 +14085,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 9
     m_Data: {fileID: 21300000, guid: a12c577a9e5766f42959e1a46403fd3f, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: 21300000, guid: 8ac23e15005405f4f8c040547d679d10, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
-  - m_RefCount: 642
+  - m_RefCount: 641
     m_Data:
       e00: 1
       e01: 0
@@ -14115,7 +14107,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 642
+  - m_RefCount: 641
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -14209,6 +14201,7 @@ GameObject:
   - component: {fileID: 1698360391}
   - component: {fileID: 1698360390}
   - component: {fileID: 1698360394}
+  - component: {fileID: 1698360395}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -14320,6 +14313,18 @@ MonoBehaviour:
   MuteBtn: {fileID: 2037504671}
   Unmutebtn: {fileID: 1807703835}
   audioMixer: {fileID: 24100000, guid: 4ffac467af306104b9685db76eb65bc7, type: 2}
+--- !u!114 &1698360395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698360389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a6c4b51277e4347a8297dff97775b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1725407446
 GameObject:
   m_ObjectHideFlags: 0
@@ -14429,14 +14434,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19548,7 +19553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -20126,7 +20131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -21137,7 +21142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -26232,7 +26237,7 @@ MonoBehaviour:
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 0.6156863}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 0.5529412}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.8235294}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 0.8235294}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1

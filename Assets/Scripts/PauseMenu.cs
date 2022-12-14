@@ -6,7 +6,6 @@ using UnityEngine.Audio;
 
 public class PauseMenu : MonoBehaviour
 {
-    public static bool GameIsPaused = false;
     public GameObject pauseMenuUI;
     public GameObject Pausebtn;
     public GameObject Resumebtn;
@@ -19,7 +18,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
+            if (GameContext.GameIsPaused)
             {
                 Resume();
             }
@@ -34,7 +33,7 @@ public class PauseMenu : MonoBehaviour
     {
         pauseMenuUI.SetActive(false); 
         Time.timeScale = 1f;
-        GameIsPaused = false;
+        GameContext.GameIsPaused = false;
         Pausebtn.SetActive(true);
     }
 
@@ -42,7 +41,7 @@ public class PauseMenu : MonoBehaviour
     {
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
-        GameIsPaused = true;
+        GameContext.GameIsPaused = true;
         Pausebtn.SetActive(false);
     }
 
@@ -60,6 +59,9 @@ public class PauseMenu : MonoBehaviour
 
     public void DeathMenu()
     {
+        GameContext.sDeaths++;
+        GameContext.sCracked = 0;
+        GameContext.sMoves = 0;
         Pause();
         Resumebtn.SetActive(false);
         Time.timeScale = 1f;
