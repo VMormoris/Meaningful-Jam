@@ -16,7 +16,8 @@ public class SoundManagerScript : MonoBehaviour
             GameContext.sSoundManager = this;
             DontDestroyOnLoad(this.gameObject);
         }
-        
+        else
+            Destroy(gameObject);
     }
 
     public void PlaySound(SoundClips clip)

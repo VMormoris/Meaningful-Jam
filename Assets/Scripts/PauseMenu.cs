@@ -13,6 +13,12 @@ public class PauseMenu : MonoBehaviour
     public GameObject Unmutebtn;
     public AudioMixer audioMixer;
 
+    void Start()
+    {
+        MuteBtn.SetActive(!GameContext.IsGameMuted);
+        Unmutebtn.SetActive(GameContext.IsGameMuted);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -48,6 +54,7 @@ public class PauseMenu : MonoBehaviour
     public void LoadMenu()
     {
         SceneManager.LoadScene("Menuscene");
+        Resume();
     }
 
     public void Restart()
@@ -66,21 +73,11 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    public void MuteGame(bool mute)
+    public void MuteGame()
     {
-        if (mute)
-        {
-            MuteBtn.SetActive(false);
-            Unmutebtn.SetActive(true);
-            audioMixer.SetFloat("Volume", -80.0f);
-            Debug.Log("mute");
-        }
-        else
-        {
-            MuteBtn.SetActive(true);
-            Unmutebtn.SetActive(false);
-            audioMixer.SetFloat("Volume", 0.0f);
-            Debug.Log("unmute");
-        }
+        MuteBtn.SetActive(GameContext.IsGameMuted);
+        Unmutebtn.SetActive(!GameContext.IsGameMuted);
+        audioMixer.SetFloat("Volume", GameContext.IsGameMuted ? 0.0f : -80.0f);
+        GameContext.IsGameMuted = !GameContext.IsGameMuted;
     }
 }

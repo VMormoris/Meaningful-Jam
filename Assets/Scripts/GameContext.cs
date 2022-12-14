@@ -5,6 +5,7 @@ using UnityEngine;
 public static class GameContext
 {
     public static bool GameIsPaused = false;
+    public static bool IsGameMuted = false;
     public static int sDeaths = 0;
     public static int sItems = 0;
     public static int sMoves = 0;

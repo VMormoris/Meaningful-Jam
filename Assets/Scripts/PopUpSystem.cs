@@ -21,6 +21,7 @@ public class PopUpSystem : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("Started");
         index = 0;
         ShowNextTip();
         
