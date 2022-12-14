@@ -31,20 +31,18 @@ public class TestScript : MonoBehaviour
 
     public Transform Movables;
 
-    public Vector2 mPrevDir = new Vector2(0.0f, 1.0f);
-    public Vector2 mDir;
-    public Vector3Int mTarget;
-    public bool mMoving = false;
-    public bool mSliding = false;
-    public bool mHasCollided = false;
-    public bool mSlopeUp = false;
-    public bool mSlopeDown = false;
-    public bool mCanBreak = false;
-    public bool mIsDead = false;
     public Vector3 FinishTile = new Vector3(15.5f, 499.5f);
 
-
-
+    private Vector2 mPrevDir = new Vector2(0.0f, 1.0f);
+    private Vector2 mDir;
+    private Vector3Int mTarget;
+    private bool mMoving = false;
+    private bool mSliding = false;
+    private bool mHasCollided = false;
+    private bool mSlopeUp = false;
+    private bool mSlopeDown = false;
+    private bool mCanBreak = false;
+    private bool mIsDead = false;
 
     // Update is called once per frame
     void Update()
@@ -72,7 +70,6 @@ public class TestScript : MonoBehaviour
         if (ItemsMap.HasTile(pos))
         {
             GameContext.sItems++;
-            Debug.Log("item");
             ItemsMap.SetTile(pos, null);
         }
 
@@ -101,7 +98,6 @@ public class TestScript : MonoBehaviour
                     if (SlideMap.HasTile(mTarget))
                     {
                         GameContext.sMoves++;
-                        Debug.Log(GameContext.sMoves);
                     }
                 }
             }
@@ -139,7 +135,6 @@ public class TestScript : MonoBehaviour
                 if (mSliding)
                 {
                     GameContext.sMoves++;
-                    Debug.Log(GameContext.sMoves);
                 }
             }
         }
@@ -186,7 +181,7 @@ public class TestScript : MonoBehaviour
         {
             transform.position = target;
             if (target == FinishTile)
-                SceneManager.LoadScene("Menuscene");
+                SceneManager.LoadScene("EndScene");
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
 
             if (HoleMap.HasTile(pos))

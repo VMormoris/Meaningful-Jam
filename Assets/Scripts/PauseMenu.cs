@@ -60,12 +60,12 @@ public class PauseMenu : MonoBehaviour
     public void DeathMenu()
     {
         GameContext.sDeaths++;
-        GameContext.sCracked = 0;
-        GameContext.sMoves = 0;
+        GameContext.Reset();
         Pause();
         Resumebtn.SetActive(false);
         Time.timeScale = 1f;
     }
+
     public void MuteGame(bool mute)
     {
         if (mute)

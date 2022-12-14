@@ -7,7 +7,7 @@ public class MainMenu : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("NewStagesScene"); //Load next scene from Scenes in build
+        SceneManager.LoadScene("NewStagesScenedup"); //Load next scene from Scenes in build
     }
 
     public void GoToSettingsMenu()

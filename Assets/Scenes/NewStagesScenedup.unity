@@ -14201,7 +14201,6 @@ GameObject:
   - component: {fileID: 1698360391}
   - component: {fileID: 1698360390}
   - component: {fileID: 1698360394}
-  - component: {fileID: 1698360395}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -14313,18 +14312,6 @@ MonoBehaviour:
   MuteBtn: {fileID: 2037504671}
   Unmutebtn: {fileID: 1807703835}
   audioMixer: {fileID: 24100000, guid: 4ffac467af306104b9685db76eb65bc7, type: 2}
---- !u!114 &1698360395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1698360389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05a6c4b51277e4347a8297dff97775b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1725407446
 GameObject:
   m_ObjectHideFlags: 0

@@ -37,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
         if(IsTouchingDeathTraps())
         {
             mIsDead = true;
-            Debug.Log("Dying");
             Instantiate(BloodSplatter, transform);
         }
 
