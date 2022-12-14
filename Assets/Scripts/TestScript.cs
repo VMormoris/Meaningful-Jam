@@ -48,25 +48,8 @@ public class TestScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (IsTouchingDeathTrap())
-        {
-            if (!mIsDead)
-            {
-                GameContext.sSoundManager.PlaySound(SoundClips.Dying); 
-                Instantiate(BloodSplatter, transform);
-                UICanvas.GetComponent<PauseMenu>().DeathMenu();
-            }
-            mIsDead = true;
-            
+        if (ManageDeath())
             return;
-        }
-        else if (mIsDead)
-        {
-            transform.localScale -= new Vector3(1.0f, 1.0f) * FallingSpeed * Time.deltaTime;
-            if (transform.localScale.x <= 0.0f)
-                gameObject.SetActive(false);
-            return;
-        }
 
         Vector3Int pos = ItemsMap.WorldToCell(transform.position);
         if (ItemsMap.HasTile(pos))
@@ -76,7 +59,6 @@ public class TestScript : MonoBehaviour
             ItemsMap.SetTile(pos, null);
         }
 
-
         float angle = -45.0f;
         if ((mDir.x > 0.0f && mSlopeUp) || (mDir.x < 0.0f && mSlopeDown))
             angle = 45.0f;
@@ -84,13 +66,7 @@ public class TestScript : MonoBehaviour
 
         if (CanWalk() && !mMoving)
         {
-            if (mDir.sqrMagnitude > 0.0f)
-                mPrevDir = mDir;
-            mDir.y = 0.0f;
-            mDir.x = Input.GetAxisRaw("Horizontal");
-            if (mDir.x == 0.0f)
-                mDir.y = Input.GetAxisRaw("Vertical");
-            mCanBreak = false;
+            GetUserInput();
             if (mDir.sqrMagnitude > 0.0f)
             {
                 Vector3 dir = new Vector3(mDir.x, mDir.y);
@@ -106,9 +82,7 @@ public class TestScript : MonoBehaviour
             }
         }
         else if ((mDir.x != 0.0f || mDir.y != 0.0f) && !CanWalk())
-        {
             mSliding = true;
-        }
 
         if(Colliding() && !mHasCollided)
         {
@@ -123,14 +97,7 @@ public class TestScript : MonoBehaviour
         }
         else if(mHasCollided)
         {
-            if (mDir.sqrMagnitude > 0.0f)
-                mPrevDir = mDir;
-            mDir.y = 0.0f;
-            mDir.x = Input.GetAxisRaw("Horizontal");
-            if (mDir.x == 0.0f)
-                mDir.y = Input.GetAxisRaw("Vertical");
-
-            mCanBreak = false;
+            GetUserInput();
             if (mDir.sqrMagnitude > 0.0f && !Colliding())
             {
                 mHasCollided = false;
@@ -145,21 +112,12 @@ public class TestScript : MonoBehaviour
 
         PushInRange();
         Move();
-
-
-        animator.SetFloat("prevHorizontal", mPrevDir.x);
-        animator.SetFloat("prevVertical", mPrevDir.y);
-        animator.SetFloat("horizontal", mDir.x);
-        animator.SetFloat("vertical", mDir.y);
-        animator.SetFloat("Speed", mDir.sqrMagnitude);
-        animator.SetBool("Sliding", mSliding);
+        UpdateAnimator();
     }
-
-
+    
     private void Move()
     {
         float speed = Speed * (mCanBreak ? 1.5f : 1.0f);
-        Vector3 target = WalkMap.GetCellCenterWorld(mTarget);
         Vector3 dir = new Vector3(mDir.x, mDir.y);
         if (mMoving)
         {
@@ -178,74 +136,122 @@ public class TestScript : MonoBehaviour
                     Instantiate(BreakingSnowball, BreakableMap.GetCellCenterWorld(pos), Quaternion.Euler(0.0f, 0.0f, 0.0f));
                 }
             }
-
         }
 
-        float dist = Vector3.Distance(target, transform.position);
-        if (dist <= 0.0899999999999f)
-        {
-            transform.position = target;
-
-            if (target == FinishTile)
-                SceneManager.LoadScene("EndScene");
-            Vector3Int pos = WalkMap.WorldToCell(transform.position);
-            if (TipsMap.HasTile(pos) && mMoving)
-            {
-                Debug.Log("hey");
-                UICanvas.transform.GetChild(0).GetChild(0).GetComponent<PopUpSystem>().ShowNextTip();
-                TipsMap.SetTile(pos, null);
-            }
-
-            if (HoleMap.HasTile(pos))
-            {
-                GameContext.sSoundManager.PlaySound(SoundClips.Falling);
-                mIsDead = true;
-                UICanvas.GetComponent<PauseMenu>().DeathMenu();
-            }
-
-            Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
-            if (CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
-            {
-                GameContext.sSoundManager.PlaySound(SoundClips.Cracking);
-                CrackedMap.SetTile(prev, null);
-                HoleMap.SetTile(prev, Hole);
-                GameContext.sCracked++;
-            }
-
-            if (WalkMap.HasTile(mTarget) || CrackedMap.HasTile(mTarget))
-            {
-                mTarget = WalkMap.WorldToCell(transform.position);
-                mMoving = false;
-                
-            }
-            else
-                mTarget = SlideMap.WorldToCell(transform.position + dir);
-
-            Vector3Int DownNext = mTarget + new Vector3Int(0, -1);
-            if (SlopeMap.HasTile(mTarget))
-                mTarget += new Vector3Int((int)mDir.x, 1);
-            else if (ElevatedMap.HasTile(pos) && SlideMap.HasTile(mTarget) && SlopeMap.HasTile(DownNext))
-                mTarget += new Vector3Int((int)mDir.x, -1);
-
-            if (WalkMap.HasTile(pos) || CrackedMap.HasTile(pos))
-            {
-                mSliding = false;
-                if (!WalkMap.HasTile(mTarget) && !CrackedMap.HasTile(mTarget))
-                {
-                    mPrevDir = mDir;
-                    mDir = new Vector2(0.0f, 0.0f);
-                }
-            }
-
-            mSlopeUp = false;
-            mSlopeDown = false;
-        }
+        HandleTargetReached();
 
         if(!mMoving)
         {
             int y = (int)transform.position.y;
             transform.position = new Vector3(transform.position.x, y + (y <= 0 ? -0.5f : 0.5f));
         }
+    }
+
+    private void HandleTargetReached()
+    {
+        Vector3 target = WalkMap.GetCellCenterWorld(mTarget);
+        float dist = SquareDistance(target, transform.position);
+        if (dist > 0.0081f)
+            return;
+
+        transform.position = target;
+        if (target == FinishTile)
+            SceneManager.LoadScene("EndScene");
+        Vector3Int pos = WalkMap.WorldToCell(transform.position);
+        if (TipsMap.HasTile(pos) && mMoving)
+        {
+            UICanvas.transform.GetChild(0).GetChild(0).GetComponent<PopUpSystem>().ShowNextTip();
+            TipsMap.SetTile(pos, null);
+        }
+
+        if (HoleMap.HasTile(pos))
+        {
+            mIsDead = true;
+            GameContext.sSoundManager.PlaySound(SoundClips.Falling);
+            UICanvas.GetComponent<PauseMenu>().DeathMenu();
+        }
+
+        Vector3 dir = new Vector3(mDir.x, mDir.y);
+        Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
+        if (CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
+        {
+            GameContext.sSoundManager.PlaySound(SoundClips.Cracking);
+            CrackedMap.SetTile(prev, null);
+            HoleMap.SetTile(prev, Hole);
+            GameContext.sCracked++;
+        }
+
+        if (WalkMap.HasTile(mTarget) || CrackedMap.HasTile(mTarget))
+        {
+            mTarget = WalkMap.WorldToCell(transform.position);
+            mMoving = false;
+
+        }
+        else
+            mTarget = SlideMap.WorldToCell(transform.position + dir);
+
+        Vector3Int DownNext = mTarget + new Vector3Int(0, -1);
+        if (SlopeMap.HasTile(mTarget))
+            mTarget += new Vector3Int((int)mDir.x, 1);
+        else if (ElevatedMap.HasTile(pos) && SlideMap.HasTile(mTarget) && SlopeMap.HasTile(DownNext))
+            mTarget += new Vector3Int((int)mDir.x, -1);
+
+        if (WalkMap.HasTile(pos) || CrackedMap.HasTile(pos))
+        {
+            mSliding = false;
+            if (!WalkMap.HasTile(mTarget) && !CrackedMap.HasTile(mTarget))
+            {
+                mPrevDir = mDir;
+                mDir = new Vector2(0.0f, 0.0f);
+            }
+        }
+
+        mSlopeUp = false;
+        mSlopeDown = false;
+    }
+
+    private void GetUserInput()
+    {
+        if (mDir.sqrMagnitude > 0.0f)
+            mPrevDir = mDir;
+        mDir.y = 0.0f;
+        mDir.x = Input.GetAxisRaw("Horizontal");
+        if (mDir.x == 0.0f)
+            mDir.y = Input.GetAxisRaw("Vertical");
+        mCanBreak = false;
+    }
+
+    private bool ManageDeath()
+    {
+        if (IsTouchingDeathTrap())
+        {
+            if (!mIsDead)
+            {
+                GameContext.sSoundManager.PlaySound(SoundClips.Dying);
+                Instantiate(BloodSplatter, transform);
+                UICanvas.GetComponent<PauseMenu>().DeathMenu();
+            }
+            mIsDead = true;
+            return true;
+        }
+        else if (mIsDead)
+        {
+            transform.localScale -= new Vector3(1.0f, 1.0f) * FallingSpeed * Time.deltaTime;
+            if (transform.localScale.x <= 0.0f)
+                gameObject.SetActive(false);
+            return true;
+        }
+        return false;
+    }
+
+    private void UpdateAnimator()
+    {
+        animator.SetFloat("prevHorizontal", mPrevDir.x);
+        animator.SetFloat("prevVertical", mPrevDir.y);
+        animator.SetFloat("horizontal", mDir.x);
+        animator.SetFloat("vertical", mDir.y);
+        animator.SetFloat("Speed", mDir.sqrMagnitude);
+        animator.SetBool("Sliding", mSliding);
     }
 
     private bool IsOnSlope()
@@ -304,7 +310,7 @@ public class TestScript : MonoBehaviour
         const float MinDistance = 1.0f;//1^2
         foreach(Transform child in Movables)
         {
-            if(QuickDistance(child.position, transform.position) <= MinDistance)
+            if(SquareDistance(child.position, transform.position) <= MinDistance)
             {
                 Movable movable = child.GetComponent<Movable>();
                 movable.Push(mDir);
@@ -312,12 +318,11 @@ public class TestScript : MonoBehaviour
         }
     }
 
-    private float QuickDistance(Vector2 a, Vector2 b)
+    private float SquareDistance(Vector2 a, Vector2 b)
     {
         float x = a.x - b.x;
         float y = a.y - b.y;
         return x * x + y * y;
-        
     }
     
 }
