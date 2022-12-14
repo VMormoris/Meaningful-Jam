@@ -19,6 +19,7 @@ public class TestScript : MonoBehaviour
     public Tilemap DeathMap;
     public Tilemap CrackedMap;
     public Tilemap HoleMap;
+    public Tilemap TipsMap;
 
     public GameObject BreakingSnowball;
     public GameObject BloodSplatter;
@@ -180,9 +181,16 @@ public class TestScript : MonoBehaviour
         if (dist <= 0.0899999999999f)
         {
             transform.position = target;
+
             if (target == FinishTile)
                 SceneManager.LoadScene("EndScene");
             Vector3Int pos = WalkMap.WorldToCell(transform.position);
+            if (TipsMap.HasTile(pos) && mMoving)
+            {
+                Debug.Log("hey");
+                UICanvas.transform.GetChild(0).GetChild(0).GetComponent<PopUpSystem>().ShowNextTip();
+                TipsMap.SetTile(pos, null);
+            }
 
             if (HoleMap.HasTile(pos))
             {
