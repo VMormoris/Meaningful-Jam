@@ -52,6 +52,7 @@ public class TestScript : MonoBehaviour
         {
             if (!mIsDead)
             {
+                GameContext.sSoundManager.PlaySound(SoundClips.Dying); 
                 Instantiate(BloodSplatter, transform);
                 UICanvas.GetComponent<PauseMenu>().DeathMenu();
             }
@@ -70,6 +71,7 @@ public class TestScript : MonoBehaviour
         Vector3Int pos = ItemsMap.WorldToCell(transform.position);
         if (ItemsMap.HasTile(pos))
         {
+            GameContext.sSoundManager.PlaySound(SoundClips.Collecting);
             GameContext.sItems++;
             ItemsMap.SetTile(pos, null);
         }
@@ -110,6 +112,7 @@ public class TestScript : MonoBehaviour
 
         if(Colliding() && !mHasCollided)
         {
+            GameContext.sSoundManager.PlaySound(SoundClips.Bumping);
             mTarget = SlideMap.WorldToCell(transform.position);
             mPrevDir = mDir;
             mDir = new Vector2(0.0f, 0.0f);
@@ -170,6 +173,7 @@ public class TestScript : MonoBehaviour
                 Vector3Int pos = BreakableMap.WorldToCell(transform.position);
                 if(BreakableMap.HasTile(pos))
                 {
+                    GameContext.sSoundManager.PlaySound(SoundClips.Breaking);
                     BreakableMap.SetTile(pos, null);
                     Instantiate(BreakingSnowball, BreakableMap.GetCellCenterWorld(pos), Quaternion.Euler(0.0f, 0.0f, 0.0f));
                 }
@@ -194,6 +198,7 @@ public class TestScript : MonoBehaviour
 
             if (HoleMap.HasTile(pos))
             {
+                GameContext.sSoundManager.PlaySound(SoundClips.Falling);
                 mIsDead = true;
                 UICanvas.GetComponent<PauseMenu>().DeathMenu();
             }
@@ -201,6 +206,7 @@ public class TestScript : MonoBehaviour
             Vector3Int prev = CrackedMap.WorldToCell(transform.position - dir);
             if (CrackedMap.HasTile(prev) && dir.sqrMagnitude > 0.0f)
             {
+                GameContext.sSoundManager.PlaySound(SoundClips.Cracking);
                 CrackedMap.SetTile(prev, null);
                 HoleMap.SetTile(prev, Hole);
                 GameContext.sCracked++;

@@ -21,6 +21,8 @@ public class Movable : MonoBehaviour
     {
         if (IsTouchingDeathTrap())
         {
+            GameContext.sSoundManager.StopSoundClip();
+            GameContext.sSoundManager.PlaySound(SoundClips.Breaking);
             Instantiate(BreakingSnowball, transform.position, Quaternion.Euler(0.0f, 0.0f, 0.0f));
             Vector3Int pos = DeathTrapMap.WorldToCell(transform.position);
             DeathTrapMap.SetTile(pos, null);
@@ -66,6 +68,7 @@ public class Movable : MonoBehaviour
 
     public void Push(Vector2 dir)
     {
+        GameContext.sSoundManager.PlaySound(SoundClips.Rolling);
         mMoving = true;
         mDir = dir;
     }

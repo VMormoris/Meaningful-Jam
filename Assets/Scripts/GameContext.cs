@@ -9,6 +9,7 @@ public static class GameContext
     public static int sItems = 0;
     public static int sMoves = 0;
     public static int sCracked = 0;
+    public static SoundManagerScript sSoundManager = null;
 
     public static int CalcHighScore()
     {
