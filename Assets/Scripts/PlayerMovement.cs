@@ -305,6 +305,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void PushInRange()
     {
+        Vector3Int pos = ElevatedMap.WorldToCell(transform.position);
+        if (!ElevatedMap.HasTile(pos))
+            return;
+        
         const float MinDistance = 1.0f;//1^2
         foreach (Transform child in Movables)
         {
