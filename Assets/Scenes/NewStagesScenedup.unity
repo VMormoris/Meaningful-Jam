@@ -1215,8 +1215,7 @@ GameObject:
   m_Component:
   - component: {fileID: 426225327}
   - component: {fileID: 426225326}
-  - component: {fileID: 426225325}
-  - component: {fileID: 426225324}
+  - component: {fileID: 426225328}
   - component: {fileID: 426225323}
   m_Layer: 0
   m_Name: Player
@@ -1245,63 +1244,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &426225324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 426225322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccf0685228db19241902db8c45e86be0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Hole: {fileID: 11400000, guid: 1d8d0063f435bdc41a2484a7ecc3c12c, type: 2}
-  WalkMap: {fileID: 878459040}
-  SlideMap: {fileID: 1245978444}
-  ObstacleMap: {fileID: 1762160651}
-  SlopeMap: {fileID: 22527302}
-  ElevatedMap: {fileID: 919230617}
-  ItemsMap: {fileID: 1857052147}
-  BreakableMap: {fileID: 1832896791}
-  DeathMap: {fileID: 1111333746}
-  CrackedMap: {fileID: 1934280257}
-  HoleMap: {fileID: 2121680576}
-  TipsMap: {fileID: 1435550998}
-  BreakingSnowball: {fileID: 1166549898723746374, guid: 6c8ab187b559121458f51ca8e60d7fec, type: 3}
-  BloodSplatter: {fileID: 4767573293344513319, guid: 100e0a178073b014a85913a311a1e82d, type: 3}
-  UICanvas: {fileID: 1698360389}
-  animator: {fileID: 426225323}
-  Speed: 5
-  FallingSpeed: 0.3
-  Movables: {fileID: 958346177}
-  FinishTile: {x: 15.5, y: 499.5, z: 0}
---- !u!114 &426225325
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 426225322}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf7979aa358cfb6449087c68c2f6b5ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SlideMap: {fileID: 1245978444}
-  ObstaclesMap: {fileID: 1762160651}
-  WalkMap: {fileID: 878459040}
-  ItemsMap: {fileID: 1857052147}
-  DeathMap: {fileID: 1111333746}
-  SlopesMap: {fileID: 22527302}
-  ElevatedMap: {fileID: 919230617}
-  BloodSplatter: {fileID: 4767573293344513319, guid: 100e0a178073b014a85913a311a1e82d, type: 3}
-  Speed: 5
-  rb: {fileID: 0}
-  animator: {fileID: 426225323}
-  mDir: {x: 0, y: 0}
-  mIsDead: 0
 --- !u!212 &426225326
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1369,6 +1311,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &426225328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426225322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7979aa358cfb6449087c68c2f6b5ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hole: {fileID: 11400000, guid: 1d8d0063f435bdc41a2484a7ecc3c12c, type: 2}
+  WalkMap: {fileID: 878459040}
+  SlideMap: {fileID: 1245978444}
+  ObstacleMap: {fileID: 1762160651}
+  SlopeMap: {fileID: 22527302}
+  ElevatedMap: {fileID: 919230617}
+  ItemsMap: {fileID: 1857052147}
+  BreakableMap: {fileID: 1832896791}
+  DeathMap: {fileID: 1111333746}
+  CrackedMap: {fileID: 1934280257}
+  HoleMap: {fileID: 2121680576}
+  TipsMap: {fileID: 1435550998}
+  BreakingSnowball: {fileID: 1166549898723746374, guid: 6c8ab187b559121458f51ca8e60d7fec, type: 3}
+  BloodSplatter: {fileID: 4767573293344513319, guid: 100e0a178073b014a85913a311a1e82d, type: 3}
+  UICanvas: {fileID: 1698360389}
+  animator: {fileID: 426225323}
+  Speed: 5
+  FallingSpeed: 0.3
+  Movables: {fileID: 958346177}
+  FinishTile: {x: 15.5, y: 499.5, z: 0}
 --- !u!1 &747537225
 GameObject:
   m_ObjectHideFlags: 0

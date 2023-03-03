@@ -15,7 +15,7 @@ public class PopUpSystem : MonoBehaviour
 
     public void ShowNextTip()
     {
-        Player.GetComponent<TestScript>().enabled = false;
+        Player.GetComponent<PlayerMovement>().enabled = false;
         PopUp(Tips[index++]);
     }
 
@@ -35,6 +35,6 @@ public class PopUpSystem : MonoBehaviour
     }
     public void ResetState()
     {
-        Player.GetComponent<TestScript>().enabled = true;
+        Player.GetComponent<PlayerMovement>().enabled = true;
     }
 }
